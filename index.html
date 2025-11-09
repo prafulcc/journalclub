@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Stopford Journal Club | A New Model For Academic Discussion
+        </title>
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+
+            /* Define the accent color */
+            :root {
+                --accent-blue: #2563eb; /* A bright, modern blue */
+                --accent-blue-light: #3b82f6;
+            }
+
+            /* Custom Tailwind config (inlined for simplicity) */
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'accent-blue': 'var(--accent-blue)',
+                            'accent-blue-light': 'var(--accent-blue-light)',
+                            'gray-950': '#0C0C0D',
+                            'gray-900': '#111112',
+                            'gray-800': '#1C1C1E',
+                            'gray-700': '#2C2C2E',
+                        },
+                    }
+                }
+            }
+
+            /* Bokeh Animation Keyframes */
+            /* Removed animation keyframes */
+
+            /* NEW: Shiny Card Effect CSS */
+            .shiny-card {
+                position: relative;
+                overflow: hidden;
+            }
+            .shiny-card::before {
+                content: '';
+                position: absolute;
+                left: var(--mouse-x, 0px);
+                top: var(--mouse-y, 0px);
+                width: 500px; /* Larger glow */
+                height: 500px;
+                background: radial-gradient(circle at center, rgba(212, 175, 55, 0.6) 0%, rgba(138, 43, 226, 0.4) 40%, transparent 70%); /* Gold to Purple */
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                pointer-events: none;
+                z-index: -1; /* Behind the card */
+            }
+            .shiny-card::after {
+                content: '';
+                position: absolute;
+                left: var(--mouse-x, 0px); /* Default to 0px */
+                top: var(--mouse-y, 0px);  /* Default to 0px */
+                width: 400px; /* Made the light a bit bigger */
+                height: 400px;
+                background: radial-gradient(circle at center, rgba(233, 213, 255, 0.8) 0%, rgba(212, 175, 55, 0.6) 40%, transparent 70%); /* Light Purple to Gold */
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                pointer-events: none;
+                mix-blend-mode: color-dodge; /* Changed for a more colourful effect */
+                z-index: 1; /* Ensure it's on top of content */
+            }
+            .shiny-card:hover::before {
+                opacity: 0.6; /* Strong glow */
+            }
+            .shiny-card:hover::after {
+                opacity: 0.2; /* color-dodge is strong, so lower opacity */
+            }
+        </style>
+    </head>
+    <body class="bg-black text-gray-200 leading-relaxed antialiased">
+        <!--
+      BACKGROUND ANIMATION LAYER
+      This stays fixed in the background. Content will scroll over it.
+    -->
+        <div class="fixed inset-0 -z-10 overflow-hidden">
+            <!-- Gradient Mesh -->
+            <div class="absolute inset-0 z-0 opacity-20">
+                <div
+                    class="absolute top-0 left-1/4 w-96 h-96 bg-accent-blue rounded-full filter blur-3xl opacity-50"
+                ></div>
+                <div
+                    class="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-800 rounded-full filter blur-3xl opacity-50"
+                ></div>
+                <div
+                    class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-600 rounded-full filter blur-3xl opacity-50"
+                ></div>
+            </div>
+
+            <!-- Added Bokeh Balls (Static, for effect) -->
+            <div
+                class="absolute top-1/4 left-1/3 w-48 h-48 bg-yellow-400 rounded-full filter blur-3xl opacity-10"
+            ></div>
+            <!-- MODIFIED: Fixed non-standard 'gold' class to 'yellow' -->
+            <div
+                class="absolute bottom-1/4 right-1/4 w-56 h-56 bg-yellow-500 rounded-full filter blur-3xl opacity-10"
+            ></div>
+            <div
+                class="absolute top-1/2 left-1/10 w-40 h-40 bg-purple-500 rounded-full filter blur-3xl opacity-10"
+            ></div>
+            <div
+                class="absolute bottom-1/3 left-1/5 w-60 h-60 bg-yellow-600 rounded-full filter blur-3xl opacity-10"
+            ></div>
+
+            <!-- NEW: Added more bokeh balls as requested -->
+            <div
+                class="absolute bottom-1/2 left-1/4 w-40 h-40 bg-purple-600 rounded-full filter blur-3xl opacity-10"
+            ></div>
+            <div
+                class="absolute top-1/3 right-1/3 w-56 h-56 bg-yellow-400 rounded-full filter blur-3xl opacity-10"
+            ></div>
+            <div
+                class="absolute top-3/4 left-1/2 w-48 h-48 bg-purple-400 rounded-full filter blur-3xl opacity-10"
+            ></div>
+            <div
+                class="absolute bottom-1/4 right-1/2 w-64 h-64 bg-yellow-500 rounded-full filter blur-3xl opacity-10"
+            ></div>
+        </div>
+
+        <!--
+      CONTENT WRAPPER
+      This is the main container for all page content.
+      It's positioned on top of the background animation.
+    -->
+        <div class="relative z-10">
+            <!-- Header -->
+            <header
+                class="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-gray-700/50"
+            >
+                <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <!-- Logo/Title -->
+                        <div class="flex-shrink-0">
+                            <a href="#" class="text-xl font-bold text-white"
+                                >📚 Stopford Journal Club</a
+                            >
+                        </div>
+                        <!-- Navigation Links -->
+                        <div
+                            class="hidden md:flex md:items-center md:space-x-8"
+                        >
+                            <a
+                                href="#newsletter"
+                                class="text-gray-300 hover:text-white transition duration-150 text-sm font-medium"
+                                >Newsletter</a
+                            >
+                            <a
+                                href="#events"
+                                class="text-gray-300 hover:text-white transition duration-150 text-sm font-medium"
+                                >Events</a
+                            >
+                            <a
+                                href="#content"
+                                class="text-gray-300 hover:text-white transition duration-150 text-sm font-medium"
+                                >See Our Work</a
+                            >
+                            <!-- MODIFIED: More colourful button -->
+                            <a
+                                href="#join-us"
+                                class="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-500/30 transition duration-300 transform hover:-translate-y-0.5"
+                            >
+                                Apply to Join
+                            </a>
+                        </div>
+                        <!-- Mobile Menu Button -->
+                        <div class="md:hidden">
+                            <button
+                                id="mobile-menu-button"
+                                type="button"
+                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                                aria-controls="mobile-menu"
+                                aria-expanded="false"
+                            >
+                                <span class="sr-only">Open main menu</span>
+                                <!-- Hamburger Icon --><svg
+                                    id="icon-open"
+                                    class="block h-6 w-6"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="2"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M4 6h16M4 12h16m-7 6h7"
+                                    />
+                                </svg>
+                                <!-- Close Icon --><svg
+                                    id="icon-close"
+                                    class="hidden h-6 w-6"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="2"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu, shown/hidden based on button click -->
+                    <div class="md:hidden hidden" id="mobile-menu">
+                        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                            <a
+                                href="#newsletter"
+                                class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                                >Newsletter</a
+                            >
+                            <a
+                                href="#events"
+                                class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                                >Events</a
+                            >
+                            <a
+                                href="#content"
+                                class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                                >See Our Work</a
+                            >
+                        </div>
+                        <div class="pb-3 pt-4 border-t border-gray-700/50">
+                            <div class="px-5">
+                                <!-- MODIFIED: More colourful button -->
+                                <a
+                                    href="#join-us"
+                                    class="block w-full text-center px-5 py-2 text-base font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-500/30 transition duration-150"
+                                >
+                                    Apply to Join
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Hero Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    class="bg-transparent pt-24 pb-32 md:pt-32 md:pb-40 lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div
+                        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+                    >
+                        <h1
+                            class="text-4xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 leading-tight"
+                        >
+                            Finally. A Journal Club That Respects Your Time.
+                        </h1>
+                        <h2
+                            class="mt-4 text-4xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-blue-light to-blue-400 leading-tight"
+                        ></h2>
+                        <p
+                            class="mt-8 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto"
+                        >
+                            We're a high-commitment group of Manchester medical
+                            students who were tired of shallow discussions and
+                            wasted time. We built a rock-solid process to
+                            guarantee a high-value analysis, every single week.
+                        </p>
+                        <div
+                            class="mt-12 flex flex-col sm:flex-row justify-center gap-4"
+                        >
+                            <!-- MODIFIED: More colourful button -->
+                            <a
+                                href="#join-us"
+                                class="px-8 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-400 rounded-full hover:from-blue-600 hover:to-blue-500 shadow-lg shadow-blue-500/40 transition duration-300 transform hover:-translate-y-0.5"
+                            >
+                                Apply to Join the Club
+                            </a>
+                            <!-- MODIFIED: More colourful button -->
+                            <a
+                                href="#newsletter"
+                                class="px-8 py-3 font-semibold text-white bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full hover:from-purple-600 hover:to-indigo-600 shadow-lg shadow-purple-500/30 transition duration-300 transform hover:-translate-y-0.5"
+                            >
+                                Get our "1-Page Weekly" &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Problem Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    class="py-20 md:py-28 bg-gray-950/80 backdrop-blur-lg border-y border-gray-700/50 lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="text-center">
+                            <h2
+                                class="text-3xl md:text-5xl font-bold text-white"
+                            >
+                                The Problem
+                            </h2>
+                            <p
+                                class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto"
+                            >
+                                You're busy. You show up to a journal club
+                                hoping to learn something, and instead you get:
+                            </p>
+                        </div>
+                        <div
+                            class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                        >
+                            <!-- Card 1 -->
+                            <div
+                                class="bg-gray-900/80 p-8 rounded-3xl border border-gray-700/50 shadow-lg shiny-card"
+                            >
+                                <span
+                                    class="text-5xl"
+                                    role="img"
+                                    aria-label="face with no mouth"
+                                    >😶</span
+                                >
+                                <h3
+                                    class="mt-4 text-2xl font-semibold text-white"
+                                >
+                                    Blank Stares
+                                </h3>
+                                <p class="mt-3 text-gray-300">
+                                    The awkward silence after the presenter
+                                    asks, "So... what did you guys think?"
+                                </p>
+                            </div>
+                            <!-- Card 2 -->
+                            <div
+                                class="bg-gray-900/80 p-8 rounded-3xl border border-gray-700/50 shadow-lg shiny-card"
+                            >
+                                <span
+                                    class="text-5xl"
+                                    role="img"
+                                    aria-label="chart decreasing"
+                                    >📉</span
+                                >
+                                <h3
+                                    class="mt-4 text-2xl font-semibold text-white"
+                                >
+                                    No Accountability
+                                </h3>
+                                <p class="mt-3 text-gray-300">
+                                    You did the reading, but it's clear most
+                                    people didn't. The discussion is built on
+                                    opinions, not analysis.
+                                </p>
+                            </div>
+                            <!-- Card 3 -->
+                            <div
+                                class="bg-gray-900/80 p-8 rounded-3xl border border-gray-700/50 shadow-lg shiny-card"
+                            >
+                                <span
+                                    class="text-5xl"
+                                    role="img"
+                                    aria-label="hourglass"
+                                    >⏳</span
+                                >
+                                <h3
+                                    class="mt-4 text-2xl font-semibold text-white"
+                                >
+                                    Wasted Time
+                                </h3>
+                                <p class="mt-3 text-gray-300">
+                                    An hour of your life you'll never get back,
+                                    with no clear takeaways.
+                                </p>
+                            </div>
+                            <!-- Card 4 -->
+                            <div
+                                class="bg-gray-900/80 p-8 rounded-3xl border border-gray-700/50 shadow-lg shiny-card"
+                            >
+                                <span
+                                    class="text-5xl"
+                                    role="img"
+                                    aria-label="facepalm"
+                                    >🤦</span
+                                >
+                                <h3
+                                    class="mt-4 text-2xl font-semibold text-white"
+                                >
+                                    No Experts
+                                </h3>
+                                <p class="mt-3 text-gray-300">
+                                    You'd never *dream* of inviting a respected
+                                    professor or advisor to a meeting this
+                                    unstructured.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Our Model Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    id="our-model"
+                    class="bg-transparent py-20 md:py-28 lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="text-center">
+                            <h2
+                                class="text-3xl md:text-5xl font-bold text-white"
+                            >
+                                Our Solution: The 2-Session System
+                            </h2>
+                            <p
+                                class="mt-4 text-lg text-gray-300 max-w-3xl mx-auto"
+                            >
+                                We treat our discussion as a high-value product.
+                                To create a great product, you need a rock-solid
+                                process. We separate
+                                <strong class="text-gray-100"
+                                    >Preparation</strong
+                                >
+                                from
+                                <strong class="text-gray-100"
+                                    >Performance</strong
+                                >.
+                            </p>
+                        </div>
+
+                        <div
+                            class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
+                        >
+                            <!-- Session 1 -->
+                            <div
+                                class="bg-gray-900/80 backdrop-blur-lg p-8 rounded-3xl border border-gray-700/50 shiny-card"
+                            >
+                                <span
+                                    class="text-sm font-bold text-accent-blue-light bg-blue-900/50 px-4 py-1 rounded-full"
+                                    >Session 1</span
+                                >
+                                <h3
+                                    class="mt-4 text-3xl font-semibold text-white"
+                                >
+                                    The "Inquiry"
+                                </h3>
+                                <p class="mt-3 text-lg text-gray-300">
+                                    This session guarantees everyone is
+                                    prepared.
+                                </p>
+                                <ul class="mt-6 space-y-4 text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg
+                                            class="flex-shrink-0 h-6 w-6 text-accent-blue-light mt-1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                                            />
+                                        </svg>
+                                        <span class="ml-3"
+                                            ><strong class="text-gray-100"
+                                                >Format:</strong
+                                            >
+                                            We read the paper *together* in a
+                                            collaborative session.</span
+                                        >
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg
+                                            class="flex-shrink-0 h-6 w-6 text-accent-blue-light mt-1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"
+                                            />
+                                        </svg>
+                                        <span class="ml-3"
+                                            ><strong class="text-gray-100"
+                                                >Tactic:</strong
+                                            >
+                                            We collectively generate a list of
+                                            5-10 high-quality questions.</span
+                                        >
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg
+                                            class="flex-shrink-0 h-6 w-6 text-accent-blue-light mt-1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
+                                            />
+                                        </svg>
+                                        <span class="ml-3"
+                                            ><strong class="text-gray-100"
+                                                >Outcome:</strong
+                                            >
+                                            A shared "agenda" for Session 2. No
+                                            more blank stares.</span
+                                        >
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Session 2 -->
+                            <div
+                                class="bg-gray-900/80 backdrop-blur-lg p-8 rounded-3xl border border-gray-700/50 shiny-card"
+                            >
+                                <span
+                                    class="text-sm font-bold text-accent-blue-light bg-blue-900/50 px-4 py-1 rounded-full"
+                                    >Session 2</span
+                                >
+                                <h3
+                                    class="mt-4 text-3xl font-semibold text-white"
+                                >
+                                    The "Breakdown"
+                                </h3>
+                                <p class="mt-3 text-lg text-gray-300">
+                                    This is our high-value "performance"
+                                    session.
+                                </p>
+                                <ul class="mt-6 space-y-4 text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg
+                                            class="flex-shrink-0 h-6 w-6 text-accent-blue-light mt-1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M7.5 8.25h9m-9 3H12m-6.75 3h9m-9 3h9m-9 3H12m6.375-10.5-1.096-1.096a1.125 1.125 0 0 1 0-1.591l.114-.114a1.125 1.125 0 0 1 1.591 0l1.096 1.096m-1.745 8.25-1.096-1.096a1.125 1.125 0 0 1 0-1.591l.114-.114a1.125 1.125 0 0 1 1.591 0l1.096 1.096M16.5 12h.008v.008H16.5V12Z"
+                                            />
+                                        </svg>
+                                        <span class="ml-3"
+                                            ><strong class="text-gray-100"
+                                                >Presentation (20m):</strong
+                                            >
+                                            One member presents a concise
+                                            summary (rotates weekly).</span
+                                        >
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg
+                                            class="flex-shrink-0 h-6 w-6 text-accent-blue-light mt-1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A9.065 9.065 0 0 1 12 3c2.17 0 4.207.576 5.963 1.584a9.065 9.065 0 0 1-5.963 15.84Zm-4.837.89-.001-.03c0-.224.012-.447.037-.666A11.944 11.944 0 0 0 12 21c2.17 0 4.207-.576 5.963-1.584A9.065 9.065 0 0 0 12 3c-2.17 0-4.207-.576-5.963 1.584a9.065 9.065 0 0 0 5.963 15.84Z"
+                                            />
+                                        </svg>
+                                        <span class="ml-3"
+                                            ><strong class="text-gray-100"
+                                                >Discussion (40m):</strong
+                                            >
+                                            We use our question list to run a
+                                            deep, structured, and critical
+                                            discussion.</span
+                                        >
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg
+                                            class="flex-shrink-0 h-6 w-6 text-accent-blue-light mt-1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                            />
+                                        </svg>
+                                        <span class="ml-3"
+                                            ><strong class="text-gray-100"
+                                                >Outcome:</strong
+                                            >
+                                            A meeting you can be proud to invite
+                                            faculty and advisors to.</span
+                                        >
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- YouTube Content Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    id="content"
+                    class="py-20 md:py-28 bg-gray-950/80 backdrop-blur-lg border-y border-gray-700/50 lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+                        <h2
+                            class="text-3xl md:text-5xl font-bold tracking-tight text-white"
+                        >
+                            See Our Work: The 15-Minute Breakdown
+                        </h2>
+                        <p
+                            class="mt-6 text-lg leading-8 text-gray-300 max-w-3xl mx-auto"
+                        >
+                            Want to see our process in action? We film our best
+                            presentations, incorporating the group's key
+                            insights, and post them for the world. This is our
+                            "flagship" content—the ultimate proof of our
+                            quality.
+                        </p>
+                        <div
+                            class="mt-12 w-full aspect-video rounded-3xl shadow-2xl bg-gray-900 text-white flex items-center justify-center border border-gray-700/50 overflow-hidden"
+                        >
+                            <!-- Placeholder for an embedded video --><img
+                                src="https://placehold.co/1280x720/111112/ffffff?text=15-Minute+Breakdown\n(Video+Placeholder)"
+                                alt="15-Minute Breakdown Video Placeholder"
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
+                        <a
+                            href="#"
+                            class="inline-block mt-8 text-lg font-medium text-accent-blue-light hover:text-blue-400"
+                        >
+                            See all breakdowns on our YouTube channel
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Upcoming Events Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    id="events"
+                    class="py-20 md:py-28 bg-transparent lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="text-center">
+                            <h2
+                                class="text-3xl md:text-5xl font-bold text-white"
+                            >
+                                Upcoming Events
+                            </h2>
+                            <p
+                                class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto"
+                            >
+                                Our "Breakdown" sessions (Session 2) are open to
+                                all. Come see our process in action.
+                            </p>
+                        </div>
+                        <div class="mt-16 max-w-3xl mx-auto space-y-6">
+                            <!-- Event 1 -->
+                            <div
+                                class="bg-gray-900/80 backdrop-blur-lg p-6 rounded-3xl border border-gray-700/50 flex flex-col sm:flex-row items-start sm:items-center justify-between shiny-card"
+                            >
+                                <div>
+                                    <span
+                                        class="text-sm font-semibold text-accent-blue-light"
+                                        >25 NOV 2025 @ 5:00 PM</span
+                                    >
+                                    <h3
+                                        class="mt-1 text-xl font-semibold text-white"
+                                    >
+                                        Breakdown: "AAV-based Gene Therapy
+                                        for..."
+                                    </h3>
+                                    <p class="mt-1 text-gray-400">
+                                        Location: Stopford Building, Room 2.15
+                                    </p>
+                                </div>
+                                <!-- MODIFIED: More colourful button -->
+                                <a
+                                    href="#"
+                                    class="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full hover:from-purple-700 hover:to-blue-700 shadow-md shadow-purple-500/30 transition duration-150 transform hover:-translate-y-0.5"
+                                >
+                                    Add to Calendar
+                                </a>
+                            </div>
+                            <!-- Event 2 -->
+                            <div
+                                class="bg-gray-900/80 backdrop-blur-lg p-6 rounded-3xl border border-gray-700/50 flex flex-col sm:flex-row items-start sm:items-center justify-between shiny-card"
+                            >
+                                <div>
+                                    <span
+                                        class="text-sm font-semibold text-accent-blue-light"
+                                        >02 DEC 2025 @ 5:00 PM</span
+                                    >
+                                    <h3
+                                        class="mt-1 text-xl font-semibold text-white"
+                                    >
+                                        Breakdown: "CRISPR-Cas9 vs. Prime
+                                        Editing..."
+                                    </h3>
+                                    <p class="mt-1 text-gray-400">
+                                        Location: Alan Gilbert Learning Commons,
+                                        Room 304
+                                    </p>
+                                </div>
+                                <!-- MODIFIED: More colourful button -->
+                                <a
+                                    href="#"
+                                    class="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0 px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full hover:from-purple-700 hover:to-blue-700 shadow-md shadow-purple-500/30 transition duration-150 transform hover:-translate-y-0.5"
+                                >
+                                    Add to Calendar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Newsletter Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    id="newsletter"
+                    class="py-20 md:py-28 bg-gray-950/80 backdrop-blur-lg border-y border-gray-700/50 lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div
+                            class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+                        >
+                            <!-- Left Column: Content -->
+                            <div>
+                                <h2
+                                    class="text-3xl md:text-5xl font-bold text-white"
+                                >
+                                    From Discussion to Deliverable.
+                                </h2>
+                                <p class="mt-4 text-lg text-gray-300">
+                                    We're not just talking. We're building a
+                                    publishing pipeline to prove our value. Our
+                                    internal work becomes our external "social
+                                    proof." Get the "product" without the
+                                    "process."
+                                </p>
+                                <div class="mt-8 space-y-4">
+                                    <div>
+                                        <h4
+                                            class="text-xl font-semibold text-white"
+                                        >
+                                            "The 1-Page Weekly" (Newsletter)
+                                        </h4>
+                                        <p class="text-gray-300">
+                                            A newsletter with the paper summary,
+                                            3 "Why You Care" bullets, our 2 best
+                                            questions, and clinical takeaways.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-semibold text-white"
+                                        >
+                                            "The 10-Minute Breakdown" (Flagship)
+                                        </h4>
+                                        <p class="text-gray-300">
+                                            A polished YouTube video of the
+                                            presentation, incorporating the best
+                                            insights from our group discussion.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Signup Form -->
+                            <div
+                                class="bg-gray-900/80 backdrop-blur-lg p-8 rounded-3xl border border-gray-700/50 shadow-2xl shiny-card"
+                            >
+                                <h3 class="text-2xl font-bold text-white">
+                                    Subscribe to "The 1-Page Weekly"
+                                </h3>
+                                <p class="mt-2 text-gray-300">
+                                    Get our group's best insights, paper
+                                    summaries, and critical questions delivered
+                                    to your inbox.
+                                </p>
+                                <form class="mt-6">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label
+                                                for="name"
+                                                class="block text-sm font-medium text-gray-300 sr-only"
+                                                >First Name</label
+                                            >
+                                            <input
+                                                type="text"
+                                                id="name"
+                                                name="name"
+                                                class="mt-1 block w-full px-5 py-3 rounded-full bg-gray-800 text-white border-gray-700 shadow-sm focus:border-accent-blue focus:ring-accent-blue"
+                                                placeholder="First Name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label
+                                                for="email"
+                                                class="block text-sm font-medium text-gray-300 sr-only"
+                                                >Email Address</label
+                                            >
+                                            <input
+                                                type="email"
+                                                id="email"
+                                                name="email"
+                                                required
+                                                class="mt-1 block w-full px-5 py-3 rounded-full bg-gray-800 text-white border-gray-700 shadow-sm focus:border-accent-blue focus:ring-accent-blue"
+                                                placeholder="your@email.com"
+                                            />
+                                        </div>
+                                    </div>
+                                    <!-- MODIFIED: More colourful button -->
+                                    <button
+                                        type="submit"
+                                        class="mt-6 w-full px-8 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-400 rounded-full hover:from-blue-600 hover:to-blue-500 shadow-lg shadow-blue-500/40 transition duration-300 transform hover:-translate-y-0.5"
+                                    >
+                                        Subscribe
+                                    </button>
+                                    <p
+                                        class="mt-3 text-xs text-gray-500 text-center"
+                                    >
+                                        No spam, ever. Unsubscribe anytime.
+                                    </p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Endgame Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    class="py-20 md:py-28 bg-transparent lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div
+                        class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+                    >
+                        <h2 class="text-3xl md:text-5xl font-bold text-white">
+                            The Endgame
+                        </h2>
+                        <p class="mt-4 text-lg text-gray-300">
+                            This isn't just a journal club. It's a system to
+                            kickstart our academic careers.
+                        </p>
+                    </div>
+                    <!-- Phases -->
+                    <div
+                        class="mt-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                    >
+                        <!-- Phase 1 -->
+                        <div
+                            class="bg-gray-900/80 backdrop-blur-lg p-6 rounded-3xl border border-gray-700/50 shiny-card"
+                        >
+                            <span
+                                class="block text-sm font-semibold text-accent-blue-light"
+                                >Phase 1</span
+                            >
+                            <h3 class="mt-2 text-xl font-semibold text-white">
+                                Perfect Our System
+                            </h3>
+                            <p class="mt-2 text-gray-400">
+                                Run the 2-session model until it's a well-oiled
+                                machine.
+                            </p>
+                        </div>
+                        <!-- Phase 2 -->
+                        <div
+                            class="bg-gray-900/80 backdrop-blur-lg p-6 rounded-3xl border border-gray-700/50 shiny-card"
+                        >
+                            <span
+                                class="block text-sm font-semibold text-accent-blue-light"
+                                >Phase 2</span
+                            >
+                            <h3 class="mt-2 text-xl font-semibold text-white">
+                                Build Public Proof
+                            </h3>
+                            <p class="mt-2 text-gray-400">
+                                Grow our newsletter and YouTube channel to prove
+                                our quality.
+                            </p>
+                        </div>
+                        <!-- Phase 3 -->
+                        <div
+                            class="bg-gray-900/80 backdrop-blur-lg p-6 rounded-3xl border border-gray-700/50 shiny-card"
+                        >
+                            <span
+                                class="block text-sm font-semibold text-accent-blue-light"
+                                >Phase 3</span
+                            >
+                            <h3 class="mt-2 text-xl font-semibold text-white">
+                                Invite Academics
+                            </h3>
+                            <p class="mt-2 text-gray-400">
+                                Confidently invite high-level advisors to our
+                                proven, high-value sessions.
+                            </p>
+                        </div>
+                        <!-- Phase 4 -->
+                        <div
+                            class="bg-gray-900/80 backdrop-blur-lg p-6 rounded-3xl border border-gray-700/50 shiny-card"
+                        >
+                            <span
+                                class="block text-sm font-semibold text-accent-blue-light"
+                                >Phase 4</span
+                            >
+                            <h3 class="mt-2 text-xl font-semibold text-white">
+                                Leverage & Publish
+                            </h3>
+                            <p class="mt-2 text-gray-400">
+                                Use our new network and skills to publish our
+                                own research.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Membership CTA Section -->
+                <!-- MODIFIED: Added lg:min-h-screen and flex properties -->
+                <section
+                    id="join-us"
+                    class="py-20 md:py-28 bg-gray-950/80 backdrop-blur-lg border-t border-gray-700/50 lg:min-h-screen lg:flex lg:flex-col lg:justify-center"
+                >
+                    <div
+                        class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+                    >
+                        <h2 class="text-3xl md:text-5xl font-bold text-white">
+                            Ready to Build With Us?
+                        </h2>
+                        <p class="mt-4 text-lg text-gray-300">
+                            This is our high-commitment track. We're looking for
+                            <strong class="text-white"
+                                >5-10 motivated students</strong
+                            >
+                            who are tired of wasting time and want to be part of
+                            a team that creates real value.
+                        </p>
+                        <div
+                            class="mt-10 text-left max-w-lg mx-auto bg-gray-900/80 backdrop-blur-lg p-8 rounded-3xl shadow-md border border-gray-700/50 shiny-card"
+                        >
+                            <h3 class="text-xl font-semibold text-white">
+                                This is for you if:
+                            </h3>
+                            <ul
+                                role="list"
+                                class="list-disc list-outside mt-4 space-y-2 text-gray-300 pl-5"
+                            >
+                                <li>
+                                    You are willing to commit to our
+                                    2-session-a-week process.
+                                </li>
+                                <li>
+                                    You are excited to rotate presentation
+                                    duties and become a subject expert.
+                                </li>
+                                <li>
+                                    You want to build a "proof of concept" so
+                                    impressive that top advisors *want* to join
+                                    our discussions.
+                                </li>
+                                <li>
+                                    You see this as a launchpad for mentorship,
+                                    networking, and publication.
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- MODIFIED: More colourful button -->
+                        <a
+                            href="#"
+                            class="mt-10 inline-block px-10 py-4 font-semibold text-lg text-white bg-gradient-to-r from-blue-500 to-blue-400 rounded-full hover:from-blue-600 hover:to-blue-500 shadow-xl shadow-blue-500/40 transition duration-300 transform hover:-translate-y-0.5"
+                        >
+                            Apply to Join (Closes Soon)
+                        </a>
+                        <p class="mt-4 text-sm text-gray-500">
+                            (Applications are reviewed on a rolling basis)
+                        </p>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-transparent border-t border-gray-700/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <p class="text-center text-sm text-gray-500">
+                        &copy; 2025 Stopford Journal Club. A new model for
+                        academic discussion.
+                    </p>
+                </div>
+            </footer>
+        </div>
+        <!-- End Content Wrapper --><!-- Mobile Menu Script -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const menuButton =
+                    document.getElementById("mobile-menu-button");
+                const mobileMenu = document.getElementById("mobile-menu");
+                const iconOpen = document.getElementById("icon-open");
+                const iconClose = document.getElementById("icon-close");
+                const navLinks = mobileMenu.querySelectorAll("a");
+
+                menuButton.addEventListener("click", () => {
+                    const isExpanded =
+                        menuButton.getAttribute("aria-expanded") === "true";
+                    menuButton.setAttribute("aria-expanded", !isExpanded);
+                    mobileMenu.classList.toggle("hidden");
+                    iconOpen.classList.toggle("hidden");
+                    iconClose.classList.toggle("hidden");
+                });
+
+                // Close menu when a link is clicked
+                navLinks.forEach((link) => {
+                    link.addEventListener("click", () => {
+                        menuButton.setAttribute("aria-expanded", "false");
+                        mobileMenu.classList.add("hidden");
+                        iconOpen.classList.remove("hidden");
+                        iconClose.classList.add("hidden");
+                    });
+                });
+            });
+        </script>
+
+        <!-- NEW: Shiny Card Effect JS -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const cards = document.querySelectorAll(".shiny-card");
+
+                cards.forEach((card) => {
+                    card.addEventListener("mousemove", (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+
+                        card.style.setProperty("--mouse-x", `${x}px`);
+                        card.style.setProperty("--mouse-y", `${y}px`);
+                    });
+
+                    // Reset on mouse leave
+                    card.addEventListener("mouseleave", () => {
+                        // You could add logic here if you want it to fade out from the last position
+                        // For now, the CSS :hover pseudo-class handles the opacity change
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
